@@ -1,4 +1,4 @@
-import { UserType } from "./enums";
+import { HeaderType, UserType } from "./enums";
 
 export type User =
     { type: UserType.SELLER }
@@ -34,4 +34,11 @@ export interface IUserContext {
     setUserType: React.Dispatch<React.SetStateAction<UserType>>;
     owner: string;
     setOwner: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export interface IColumnConfig {
+    key: string;
+    title: string;
+    type: HeaderType;
+    filter?: boolean | Array<string|number|boolean>;
 }

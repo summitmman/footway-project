@@ -12,20 +12,24 @@ interface ICheckboxOption extends IOption {
 
 const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
     const filterEl = useRef(null);
+
+    // 1. Filter column configs
+    // get columns we are concerned with
     const [filterColumns] = useState<Array<IColumnConfig>>(
         columns.filter(column => (column.filter === true || (column.filter && column.filter.length)))
     );
+    // if there are no filters, then dont render the filter button
     if (!filterColumns.length) {
         return null;
     }
 
+    // 2. Filter column options
     const [filterOptions, setFilterOptions] = useState<{[key: string]: Array<ICheckboxOption>}>(filterColumns.reduce((acc, col) => {
         return ({
             ...acc,
             [col.key]: Array.isArray(col.filter) ? col.filter.map(item => ({ label: item, value: item, checked: false })): [],
         });
     }, {}));
-    const [selectedFilterColumn, setSelectedFilterColumn] = useState(filterColumns[0]);
     const populateFilterOptions = () => {
         // we only need to populate the filters which are "true" and the array is not already provided
         const uniqueSets: {[key: string]: Set<any>} = filterColumns
@@ -66,6 +70,10 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
         populateFilterOptions();
     }, []);
 
+    // 3. Select one of the filter columns to show
+    const [selectedFilterColumn, setSelectedFilterColumn] = useState(filterColumns[0]);
+
+    // 4. Actual filter values selected
     const [filterValues, setFilterValues] = useState<{[key: string]: Set<any>}>(filterColumns.reduce((acc, col) => {
         return ({
             ...acc,
@@ -74,6 +82,7 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
     }, {}))
     const noOfFilters = Object.keys(filterValues).reduce((acc, key) => acc + Number(!!filterValues[key].size), 0);
 
+    // 5. Filter select interaction
     const onFilterCheck = (option: ICheckboxOption, key: string, index: number) => {
         const newFilterValues = { ...filterValues };
         const newSet = new Set(filterValues[key]);
@@ -90,6 +99,7 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
         newOptions[key][index] = { ...option, checked: isChecked };
         setFilterOptions(newOptions);
     };
+    // 6. Send selected filters by event
     useEffect(() => {
         onFilterChange && onFilterChange(Object.keys(filterValues).reduce((acc, key) => {
             return {...acc, [key]: Array.from(filterValues[key])}
@@ -98,20 +108,24 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
     
     return (
         <div>
+            {/* Trigger */}
             <button className="btn btn-primary" onClick={() => (filterEl.current as any).showModal()}>
                 Filters
                 {noOfFilters > 0 && <div className="badge">{noOfFilters}</div>}
             </button>
+            {/* Filter Modal */}
             <dialog id="my_modal_1" className="modal" ref={filterEl}>
                 <div className="modal-box rounded-none fixed top-0 bottom-0 right-0 max-h-screen p-0">
+                    {/* Header */}
                     <div className="flex justify-between px-4 pt-2">
                         <h3 className="font-bold text-lg">Filters</h3>
                         <form method="dialog">
-                            {/* if there is a button in form, it will close the modal */}
                             <button className="btn btn-sm btn-circle btn-ghost">✕</button>
                         </form>
                     </div>
+                    {/* Filter Section */}
                     <div className="flex mt-4">
+                        {/* Filter Categories */}
                         <div className="w-32">
                             {filterColumns.map(
                                 col => (
@@ -127,6 +141,7 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                                     </button>)
                             )}
                         </div>
+                        {/* Filter Category Values; checkboxes */}
                         <div className="overflow-y-auto modal-section-height flex-grow px-4">
                             <div>
                                 {filterOptions[selectedFilterColumn.key].map((option, index) => (<div key={option.label} className="form-control">
@@ -140,7 +155,6 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                     </div>
                 </div>
                 <form method="dialog" className="modal-backdrop">
-                    {/* if there is a button in form, it will close the modal */}
                     <button>Close</button>
                 </form>
             </dialog>

@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../contexts"
 import { UserType } from "../shared/enums";
-import { IProduct } from "../shared/interfaces";
 import Dropdown from "./Dropdown";
 
 const Header = () => {

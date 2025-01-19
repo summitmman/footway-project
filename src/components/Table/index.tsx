@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { IColumnConfig } from "../../shared/interfaces";
 import { HeaderType } from "../../shared/enums";
+import { highlight } from '../../shared/utils';
 import Search from "./Search";
 import Filter from "./Filter";
 
@@ -11,18 +12,25 @@ interface ITableProps {
 
 const Table = ({ data, columns }: ITableProps) => {
     const [filteredData, setFilteredData] = useState(data);
+    
+    // 1. search
     const [search, setSearch] = useState('');
+    // 2. filters
     const [filters, setFilters] = useState<{[key: string]: Array<string|number|boolean>}>({});
     
+    // 3. filter dataset logic
     const filterData = () => {
+        // local copy of dataset
         let localData = data;
+
         const filterKeys = Object.keys(filters);
-        
-        // process only if there is something to filter
         const hasFilter = filterKeys.length && filterKeys.find(key => filters[key].length);
+        
+        // process only if there is something to filter, search or filters
         if (search || hasFilter) {
+            // loop through all records
             localData = localData.filter(d => {
-                // free text search
+                // 1. free text search
                 let searchMatch = false;
                 if (search) {
                     for (let i = 0; i < columns.length; i++) {
@@ -42,6 +50,7 @@ const Table = ({ data, columns }: ITableProps) => {
                     searchMatch = true;
                 }
                 
+                // 2. filter match
                 let filterMatch = true;
                 if (hasFilter) {
                     const keys = filterKeys;
@@ -57,6 +66,7 @@ const Table = ({ data, columns }: ITableProps) => {
                     }
                 }
 
+                // 3. merge the two filter results
                 return searchMatch && filterMatch;
             });
         }
@@ -67,20 +77,6 @@ const Table = ({ data, columns }: ITableProps) => {
         setFilteredData(filterData());
     }, [search, filters]);
 
-    const escapeRegex = (str: string) => {
-        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters
-    }
-    const highlight = (value: any) => {
-        if (search == null || search === '') {
-            return value;
-        }
-
-        if (['string', 'number'].includes(typeof value)) {
-            const escapedSearch = escapeRegex(search);
-            return String(value).replace(new RegExp(escapedSearch, "gi"), match => `<mark>${match}</mark>`);
-        }
-        return value;
-    };
 
     return (
         <div>
@@ -105,7 +101,7 @@ const Table = ({ data, columns }: ITableProps) => {
                                 <tr key={data.id} className="hover">
                                     <td><input type="checkbox" className="checkbox checkbox-primary" /></td>
                                     {
-                                        columns.map(column => <td key={column.key + data.id} dangerouslySetInnerHTML={{__html: highlight(data[column.key])}}></td>)
+                                        columns.map(column => <td key={column.key + data.id} dangerouslySetInnerHTML={{__html: highlight(search, data[column.key])}}></td>)
                                     }
                                     <td><input type="checkbox" className="toggle toggle-primary" defaultChecked /></td>
                                 </tr>

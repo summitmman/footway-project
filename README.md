@@ -48,3 +48,11 @@ export default tseslint.config({
   },
 })
 ```
+
+
+1. Infinite scroll
+2. filter owner
+3. bulk actions
+4. select row
+5. enable disable products
+6. set prices

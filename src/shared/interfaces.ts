@@ -42,3 +42,8 @@ export interface IColumnConfig {
     type: HeaderType;
     filter?: boolean | Array<string|number|boolean>;
 }
+export interface IOption<V=any, D=any> {
+    label: string;
+    value: V;
+    data?: D;
+}

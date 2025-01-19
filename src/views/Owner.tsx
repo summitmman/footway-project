@@ -21,7 +21,8 @@ const Owner = () => {
         {
             key: 'quantity',
             title: 'Stock',
-            type: HeaderType.Number
+            type: HeaderType.Number,
+            filter: [3, 8, 1]
         },
         {
             key: 'vendor',

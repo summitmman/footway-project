@@ -1,15 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { IOption } from "../shared/interfaces";
 
-export interface IOption<T=any> {
-    label: string;
-    value: T;
-    [key: string]: any;
-}
-export interface IDropdownProps<T=any> {
-    data: IOption<T>[];
+export interface IDropdownProps<V=any, D=any> {
+    data: IOption<V, D>[];
     onChange: (option: IOption | null) => void;
     label?: (option: IOption | null) => string;
-    value: T;
+    value: V;
 }
 
 const Dropdown = ({ data, onChange, label, value }: IDropdownProps) => {
@@ -56,7 +52,11 @@ const Dropdown = ({ data, onChange, label, value }: IDropdownProps) => {
     return (
         <div className="dropdown">
             <button tabIndex={0} role="button" className="btn btn-primary">{label ? label(option) : (option?.label ?? null)}</button>
-            <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow" ref={el}>
+            <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[2] w-52 p-2 shadow max-h-60 overflow-y-auto flex-nowrap"
+                ref={el}
+            >
                 {data.map(o => <li key={o.label}><a onClick={() => updateOptionState(o)}>{o.label}</a></li>)}
             </ul>
         </div>

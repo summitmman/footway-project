@@ -1,4 +1,4 @@
-import { HeaderType, UserType } from "./enums";
+import { ControlType, HeaderType, UserType } from "./enums";
 
 export type User =
     { type: UserType.SELLER }
@@ -41,9 +41,17 @@ export interface IColumnConfig {
     title: string;
     type: HeaderType;
     filter?: boolean | Array<string|number|boolean>;
+    editable?: boolean;
+    control?: ControlType;
 }
 export interface IOption<V=any, D=any> {
     label: string;
     value: V;
     data?: D;
 }
+
+export interface IDataRecord {
+    id: string | number;
+    __selected?: boolean;
+    [key: string]: any;
+};

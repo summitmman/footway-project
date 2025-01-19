@@ -65,9 +65,6 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
     };
     useEffect(() => {
         populateFilterOptions();
-    }, [data]);
-    useEffect(() => {
-        populateFilterOptions();
     }, []);
 
     // 3. Select one of the filter columns to show
@@ -83,21 +80,27 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
     const noOfFilters = Object.keys(filterValues).reduce((acc, key) => acc + Number(!!filterValues[key].size), 0);
 
     // 5. Filter select interaction
-    const onFilterCheck = (option: ICheckboxOption, key: string, index: number) => {
-        const newFilterValues = { ...filterValues };
+    const onFilterCheck = (isChecked: boolean, option: ICheckboxOption, key: string, index: number) => {
         const newSet = new Set(filterValues[key]);
-        const isChecked = !option.checked;
         if (isChecked) {
             newSet.add(option.value)
         } else {
             newSet.delete(option.value)
         }
-        newFilterValues[key] = newSet;
-        setFilterValues(newFilterValues);
+        setFilterValues({
+            ...filterValues,
+            [key]: newSet
+        });
 
-        const newOptions = { ...filterOptions };
-        newOptions[key][index] = { ...option, checked: isChecked };
-        setFilterOptions(newOptions);
+        setFilterOptions({
+            ...filterOptions,
+            [key]: filterOptions[key].map((o, i) => {
+                if (i === index) {
+                    return {...option, checked: isChecked};
+                }
+                return o;
+            })
+        });
     };
     // 6. Send selected filters by event
     useEffect(() => {
@@ -146,7 +149,7 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                             <div>
                                 {filterOptions[selectedFilterColumn.key].map((option, index) => (<div key={option.label} className="form-control">
                                     <label className="label cursor-pointer justify-normal gap-4">
-                                        <input type="checkbox" className="checkbox" checked={option.checked} onChange={() => onFilterCheck(option, selectedFilterColumn.key, index)}/>
+                                        <input type="checkbox" className="checkbox" checked={option.checked} onChange={() => onFilterCheck(!option.checked, option, selectedFilterColumn.key, index)}/>
                                         <span className="label-text">{option.label}</span>
                                     </label>
                                 </div>))}

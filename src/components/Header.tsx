@@ -22,7 +22,7 @@ const Header = () => {
     return (
         <header className="navbar py-4">
             <div className="app-container flex justify-between items-center">
-                <section id="logo">Merchange Sales Channel</section>
+                <section id="logo" className="font-bold">Merchange Sales Channel</section>
                 <section id="actions" className="flex gap-4 items-center">
                     {
                         userType === UserType.SELLER

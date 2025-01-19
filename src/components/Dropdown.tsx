@@ -6,9 +6,10 @@ export interface IDropdownProps<V=any, D=any> {
     onChange: (option: IOption | null) => void;
     label?: (option: IOption | null) => string;
     value: V;
+    disabled?: boolean;
 }
 
-const Dropdown = ({ data, onChange, label, value }: IDropdownProps) => {
+const Dropdown = ({ data, onChange, label, value, disabled }: IDropdownProps) => {
 
     const [option, setOption] = useState<IOption | null>(null);
     const [triggeredChange, setTriggeredChange] = useState(false);
@@ -51,7 +52,7 @@ const Dropdown = ({ data, onChange, label, value }: IDropdownProps) => {
 
     return (
         <div className="dropdown">
-            <button tabIndex={0} role="button" className="btn btn-primary">{label ? label(option) : (option?.label ?? null)}</button>
+            <button tabIndex={0} role="button" className="btn btn-primary" disabled={disabled}>{label ? label(option) : (option?.label ?? null)}</button>
             <ul
                 tabIndex={0}
                 className="dropdown-content menu bg-base-100 rounded-box z-[2] w-52 p-2 shadow max-h-60 overflow-y-auto flex-nowrap"

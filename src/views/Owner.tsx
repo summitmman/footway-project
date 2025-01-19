@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { UserContext } from "../contexts";
 import { Table } from "../components";
 import { TableSkeleton } from "../components/Skeletons";
-import { IColumnConfig } from "../shared/interfaces";
-import { HeaderType } from "../shared/enums";
+import { IColumnConfig, IProduct } from "../shared/interfaces";
+import { ControlType, HeaderType } from "../shared/enums";
 
 const Owner = () => {
     const { products, isPending } = useContext(UserContext);
@@ -16,7 +16,8 @@ const Owner = () => {
         {
             key: 'price',
             title: 'Price',
-            type: HeaderType.Number
+            type: HeaderType.Number,
+            editable: true
         },
         {
             key: 'quantity',
@@ -39,11 +40,44 @@ const Owner = () => {
             key: 'department',
             title: 'Department',
             type: HeaderType.StringArray
+        },
+        {
+            key: '_enable',
+            title: 'Enable',
+            type: HeaderType.Boolean,
+            editable: true,
+            control: ControlType.Switch
         }
     ];
+    const groupActions = [
+        {
+            label: 'Enable Products',
+            value: (selectedDataSet: Array<IProduct>) => {
+                return selectedDataSet.map(d => {
+                    return { ...d, _enable: true };
+                });
+            }
+        },
+        {
+            label: 'Disable Products',
+            value: (selectedDataSet: Array<IProduct>) => {
+                return selectedDataSet.map(d => {
+                    return { ...d, _enable: false };
+                });
+            }
+        },
+        {
+            label: 'Set Price',
+            value: {
+                type: 'RequestNewValue',
+                column: 'price'
+            }
+        }
+    ];
+
     return (
         <>
-            { products.length ? <Table data={products} columns={columns} /> : isPending ? <TableSkeleton /> : null }
+            { products.length ? <Table data={products} columns={columns} groupActions={groupActions} /> : isPending ? <TableSkeleton /> : null }
         </>
     );
 }

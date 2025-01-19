@@ -7,5 +7,9 @@ export enum HeaderType {
     String = 'string',
     Boolean = 'boolean',
     Number = 'number',
-    StringArray = 'stringarray'
+    StringArray = 'stringarray',
+}
+export enum ControlType {
+    Switch = 'switch',
+    TextBox = 'textbox',
 }

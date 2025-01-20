@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { UserContext } from "../contexts";
 import { Table } from "../components";
 import { TableSkeleton } from "../components/Skeletons";
-import { IColumnConfig, IProduct } from "../shared/interfaces";
-import { ControlType, HeaderType } from "../shared/enums";
+import { IAction, IColumnConfig, IOption, IProduct } from "../shared/interfaces";
+import { ActionType, ControlType, HeaderType } from "../shared/enums";
 
 const Owner = () => {
     const { products, isPending } = useContext(UserContext);
@@ -49,7 +49,7 @@ const Owner = () => {
             control: ControlType.Switch
         }
     ];
-    const groupActions = [
+    const groupActions: Array<IOption<Function | IAction>> = [
         {
             label: 'Enable Products',
             value: (selectedDataSet: Array<IProduct>) => {
@@ -69,8 +69,8 @@ const Owner = () => {
         {
             label: 'Set Price',
             value: {
-                type: 'RequestNewValue',
-                column: 'price'
+                type: ActionType.RequestNewValue,
+                columnKey: 'price'
             }
         }
     ];

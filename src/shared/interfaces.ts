@@ -1,4 +1,4 @@
-import { ControlType, HeaderType, UserType } from "./enums";
+import { ActionType, ControlType, HeaderType, UserType } from "./enums";
 
 export type User =
     { type: UserType.SELLER }
@@ -55,3 +55,14 @@ export interface IDataRecord {
     __selected?: boolean;
     [key: string]: any;
 };
+
+export interface IAction {
+    type: ActionType;
+    columnKey: string;
+}
+
+export interface IEditModalProps {
+    value: any;
+    columnConfig: IColumnConfig | null;
+    record?: IDataRecord | null;
+}

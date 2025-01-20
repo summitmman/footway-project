@@ -13,3 +13,13 @@ export enum ControlType {
     Switch = 'switch',
     TextBox = 'textbox',
 }
+
+export enum ActionType {
+    RequestNewValue = 'RequestNewValue'
+}
+
+export enum CheckStatus {
+    All = 'all',
+    Some = 'some',
+    None = 'none'
+}

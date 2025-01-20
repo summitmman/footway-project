@@ -42,6 +42,15 @@ const useFilter = ({
                             searchMatch = true;
                             break;
                         }
+                        if (column.type === HeaderType.StringArray) {
+                            const values = record[column.key];
+                            for (let j = 0; j < values.length; j++) {
+                                if (String(values[j]).toLowerCase().includes(search.toLowerCase())) {
+                                    searchMatch = true;
+                                    break;
+                                }
+                            }
+                        }
                     }
                 } else {
                     searchMatch = true;

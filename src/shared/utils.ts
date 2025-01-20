@@ -8,9 +8,18 @@ export const highlight = (search: string, value: any) => {
         return value;
     }
 
+    const escapedSearch = escapeRegex(search);
     if (['string', 'number'].includes(typeof value)) {
-        const escapedSearch = escapeRegex(search);
         return String(value).replace(new RegExp(escapedSearch, "gi"), match => `<mark>${match}</mark>`);
+    }
+
+    if (Array.isArray(value)) {
+        return value.map(v => {
+            if (['string', 'number'].includes(typeof v)) {
+                return String(v).replace(new RegExp(escapedSearch, "gi"), match => `<mark>${match}</mark>`);
+            }
+            return v;
+        });
     }
     return value;
 };

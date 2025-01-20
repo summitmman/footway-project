@@ -16,7 +16,7 @@ const Header = () => {
     const [dataOptions, setDataOptions] = useState(owners.map(o => ({label: o, value: o})));
     useEffect(() => {
         setDataOptions(owners.map(o => ({label: o, value: o})));
-    }, [owners.length]);
+    }, [owners]);
     
 
     return (

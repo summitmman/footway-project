@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "../contexts";
 import { ProductCell, Table } from "../components";
 import { TableSkeleton } from "../components/Skeletons";
@@ -6,7 +6,7 @@ import { IAction, IColumnConfig, IDataRecord, IOption, IProduct } from "../share
 import { ActionType, ControlType, HeaderType } from "../shared/enums";
 
 const Owner = () => {
-    const { products, isPending } = useContext(StoreContext);
+    const { products, isPending, owner } = useContext(StoreContext);
     const columns: Array<IColumnConfig> = [
         {
             key: 'product_name',
@@ -76,10 +76,19 @@ const Owner = () => {
             }
         }
     ];
+    const [ownerProducts, setOwnerProducts] = useState<Array<IProduct>>([]);
+    useEffect(() => {
+        if (owner) {
+            setOwnerProducts(products.filter(product => product.merchant_id === owner));
+        } else {
+            setOwnerProducts([]);
+        }
+    }, [owner]);
+
 
     return (
         <>
-            { products.length ? <Table data={products} columns={columns} groupActions={groupActions} /> : isPending ? <TableSkeleton /> : null }
+            { ownerProducts.length ? <Table key={owner} data={ownerProducts} columns={columns} groupActions={groupActions} /> : isPending ? <TableSkeleton /> : null }
         </>
     );
 }

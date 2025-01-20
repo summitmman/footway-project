@@ -1,11 +1,11 @@
 import { createContext, PropsWithChildren, useEffect, useState } from "react";
-import { IProduct, IUserContext } from "../shared/interfaces";
+import { IProduct, IStoreContext } from "../shared/interfaces";
 import { UserType } from "../shared/enums";
 import { DEFAULT_OWNER } from "../shared/constants";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "../services/products";
 
-export const UserContext = createContext<IUserContext>({
+export const StoreContext = createContext<IStoreContext>({
     isPending: false,
     owner: '',
     owners: [],
@@ -15,7 +15,7 @@ export const UserContext = createContext<IUserContext>({
     setUserType: () => {}
 });
 
-const UserProvider = ({ children }: PropsWithChildren) => {
+const StoreProvider = ({ children }: PropsWithChildren) => {
     const [userType, setUserType] = useState(UserType.OWNER);
     const [owner, setOwner] = useState(DEFAULT_OWNER);
     
@@ -37,7 +37,7 @@ const UserProvider = ({ children }: PropsWithChildren) => {
     }, [products.length]);
     
     return (
-        <UserContext.Provider
+        <StoreContext.Provider
             value={{
                 products,
                 isPending,
@@ -49,7 +49,7 @@ const UserProvider = ({ children }: PropsWithChildren) => {
             }}
         >
             {children}
-        </UserContext.Provider>
+        </StoreContext.Provider>
     );
 };
-export default UserProvider;
+export default StoreProvider;

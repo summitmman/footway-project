@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { UserContext } from "../contexts"
+import { StoreContext } from "../contexts"
 import { UserType } from "../shared/enums";
 import Dropdown from "./Dropdown";
 
@@ -11,7 +11,7 @@ const Header = () => {
         owner,
         setOwner,
         isPending
-    } = useContext(UserContext);
+    } = useContext(StoreContext);
 
     const [dataOptions, setDataOptions] = useState(owners.map(o => ({label: o, value: o})));
     useEffect(() => {

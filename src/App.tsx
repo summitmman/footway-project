@@ -1,17 +1,17 @@
 import './App.css';
 import { Header } from './components';
-import { UserProvider } from './contexts';
+import { StoreProvider } from './contexts';
 import Dashboard from './views/Dashboard';
 
 function App() {
 
   return (
-    <UserProvider>
+    <StoreProvider>
       <Header />
       <main className="app-container">
         <Dashboard />
       </main>
-    </UserProvider>
+    </StoreProvider>
   )
 }
 

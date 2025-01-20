@@ -1,1 +1,1 @@
-export { UserContext, default as UserProvider } from './UserContext';
+export { StoreContext, default as StoreProvider } from './StoreContext';

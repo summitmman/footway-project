@@ -26,7 +26,7 @@ export interface IProduct {
     product_description: string;
 }
 
-export interface IUserContext {
+export interface IStoreContext {
     products: IProduct[];
     isPending: boolean;
     owners: string[];

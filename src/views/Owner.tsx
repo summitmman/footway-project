@@ -1,12 +1,12 @@
 import { useContext } from "react";
-import { UserContext } from "../contexts";
+import { StoreContext } from "../contexts";
 import { Table } from "../components";
 import { TableSkeleton } from "../components/Skeletons";
 import { IAction, IColumnConfig, IOption, IProduct } from "../shared/interfaces";
 import { ActionType, ControlType, HeaderType } from "../shared/enums";
 
 const Owner = () => {
-    const { products, isPending } = useContext(UserContext);
+    const { products, isPending } = useContext(StoreContext);
     const columns: Array<IColumnConfig> = [
         {
             key: 'product_name',

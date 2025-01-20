@@ -14,10 +14,6 @@ const useInfiniteScroll = ({
     scrollRef,
     listRootRef
 }: IUseInfiniteScrollProps): Array<number> => {
-    if (!totalRecords) {
-        return [];
-    }
-
     // Array of total indexes
     const records = useRef(Array.from(Array(totalRecords).keys()));
     // Array of indexes managed by infinite scroll; this is what we return

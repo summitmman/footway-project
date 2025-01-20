@@ -43,6 +43,7 @@ export interface IColumnConfig {
     filter?: boolean | Array<string|number|boolean>;
     editable?: boolean;
     control?: ControlType;
+    component?: (record: IDataRecord, label: string, index: number) => JSX.Element;
 }
 export interface IOption<V=any, D=any> {
     label: string;

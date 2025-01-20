@@ -65,9 +65,20 @@ const useFilter = ({
                         if (!filters[key].length) {
                             continue;
                         }
-                        const match = filters[key].includes(record[key]);
-                        if (!match) {
-                            filterMatch = false;
+
+                        const value = record[key];
+                        if (Array.isArray(value)) {
+                            const intersection = value.filter(item => filters[key].includes(item));
+                            if (!intersection.length) {
+                                filterMatch = false;
+                                break;
+                            }
+                        } else {
+                            const match = filters[key].includes(value);
+                            if (!match) {
+                                filterMatch = false;
+                                break;
+                            }
                         }
                     }
                 }

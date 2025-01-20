@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { StoreContext } from "../contexts";
-import { Table } from "../components";
+import { ProductCell, Table } from "../components";
 import { TableSkeleton } from "../components/Skeletons";
-import { IAction, IColumnConfig, IOption, IProduct } from "../shared/interfaces";
+import { IAction, IColumnConfig, IDataRecord, IOption, IProduct } from "../shared/interfaces";
 import { ActionType, ControlType, HeaderType } from "../shared/enums";
 
 const Owner = () => {
@@ -11,7 +11,8 @@ const Owner = () => {
         {
             key: 'product_name',
             title: 'Product',
-            type: HeaderType.String
+            type: HeaderType.String,
+            component: (record: IDataRecord, label: string, index: number) => <ProductCell label={label} product={record as IProduct} index={index} />
         },
         {
             key: 'price',
@@ -39,7 +40,8 @@ const Owner = () => {
         {
             key: 'department',
             title: 'Department',
-            type: HeaderType.StringArray
+            type: HeaderType.StringArray,
+            filter: true
         },
         {
             key: '_enable',

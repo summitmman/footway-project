@@ -49,7 +49,13 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
         // create unique sets of each value
         data.forEach((d) => {
             keys.forEach((key) => {
-                uniqueSets[key].add(d[key]);
+                if (Array.isArray(d[key])) {
+                    d[key].forEach(nd => {
+                        uniqueSets[key].add(nd);
+                    });
+                } else {
+                    uniqueSets[key].add(d[key]);
+                }
             });
         });
 
@@ -108,6 +114,38 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
             return {...acc, [key]: Array.from(filterValues[key])}
         }, {}))
     }, [filterValues]);
+
+    // 7. clear filters
+    const clearFilter = (key: string) => {
+        setFilterOptions({
+            ...filterOptions,
+            [key]: filterOptions[key].map(option => ({
+                    ...option,
+                    checked: false
+            }))
+        })
+        setFilterValues({
+            ...filterValues,
+            [key]: new Set()
+        });
+    };
+    const clearAllFilters = () => {
+        setFilterOptions(Object.keys(filterOptions).reduce((acc, key) => {
+            return {
+                ...acc,
+                [key]: filterOptions[key].map(option => ({
+                    ...option,
+                    checked: false
+                }))
+            };
+        }, {}));
+        setFilterValues(filterColumns.reduce((acc, col) => {
+            return ({
+                ...acc,
+                [col.key]: new Set(),
+            });
+        }, {}));
+    };
     
     return (
         <div>
@@ -129,7 +167,7 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                     {/* Filter Section */}
                     <div className="flex mt-4">
                         {/* Filter Categories */}
-                        <div className="w-32">
+                        <div className="w-[40%]">
                             {filterColumns.map(
                                 col => (
                                     <button
@@ -139,14 +177,21 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                                         key={col.title}
                                         onClick={() => setSelectedFilterColumn(col)}
                                     >
-                                        {col.title}
+                                        <div className="break-words">{col.title}</div>
                                         {filterValues[col.key].size > 0 && <div className="badge badge-primary">{filterValues[col.key].size}</div>}
                                     </button>)
                             )}
+                            <div className="p-5">
+                                <button className="btn w-full" onClick={() => clearAllFilters()}>Clear All</button>
+                            </div>
                         </div>
                         {/* Filter Category Values; checkboxes */}
-                        <div className="overflow-y-auto modal-section-height flex-grow px-4">
-                            <div>
+                        <div className="flex-grow px-4">
+                            <div className="flex items-center justify-between">
+                                <div className="font-bold text-primary">{selectedFilterColumn.title}</div>
+                                <button className="btn" onClick={() => clearFilter(selectedFilterColumn.key)}>Clear</button>
+                            </div>
+                            <div className="overflow-y-auto modal-section-height mt-4">
                                 {filterOptions[selectedFilterColumn.key].map((option, index) => (<div key={option.label} className="form-control">
                                     <label className="label cursor-pointer justify-normal gap-4">
                                         <input type="checkbox" className="checkbox" checked={option.checked} onChange={() => onFilterCheck(!option.checked, option, selectedFilterColumn.key, index)}/>

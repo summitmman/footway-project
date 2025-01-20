@@ -7,7 +7,7 @@
 }
 
 .modal-section-height {
-  height: calc(100vh - 60px);
+  height: calc(100vh - 130px);
 }
 .checkbox[aria-checked=mixed] {
   --tw-bg-opacity: 1;

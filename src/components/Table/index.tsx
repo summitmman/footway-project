@@ -117,6 +117,7 @@ const Table = ({ data, columns, groupActions = [] }: ITableProps) => {
                         </tr>
                     </thead>
                     <tbody ref={listRootEl}>
+                        {!filteredRecords.length && <tr><td colSpan={columns.length + 1} className="text-center">No Records found</td></tr>}
                         {
                             scrollManagedIndexes.map(rowIndex => {
                                 const record = filteredRecords[rowIndex];
@@ -128,6 +129,9 @@ const Table = ({ data, columns, groupActions = [] }: ITableProps) => {
                                         <td><input type="checkbox" className="checkbox checkbox-primary" checked={ !!record.__selected } onChange={() => toggleRowSelect(!record.__selected, record.id, record)} /></td>
                                         {
                                             columns.map(column => {
+                                                if (column.component) {
+                                                    return <td key={column.key + record.id}>{column.component(record, highlight(search, record[column.key]), rowIndex)}</td>
+                                                }
                                                 if (column.editable && column.control === ControlType.Switch) {
                                                     return <td key={column.key + record.id}><input type="checkbox" className="toggle toggle-primary" checked={ !!record[column.key] } onChange={() => toggleSwitch(!record[column.key], column.key, record)} /></td>;
                                                 }

@@ -32,20 +32,20 @@ const useFilter = ({
                 if (search) {
                     for (let i = 0; i < columnConfigs.length; i++) {
                         const column = columnConfigs[i];
+                        const v = column.value ? column.value(record, i) : record[column.key];
                         if (
                             (
                                 column.type === HeaderType.String
                                 || column.type === HeaderType.Number
                             )
-                            && String(record[column.key]).toLowerCase().includes(search.toLowerCase())
+                            && String(v).toLowerCase().includes(search.toLowerCase())
                         ) {
                             searchMatch = true;
                             break;
                         }
                         if (column.type === HeaderType.StringArray) {
-                            const values = record[column.key];
-                            for (let j = 0; j < values.length; j++) {
-                                if (String(values[j]).toLowerCase().includes(search.toLowerCase())) {
+                            for (let j = 0; j < v.length; j++) {
+                                if (String(v[j]).toLowerCase().includes(search.toLowerCase())) {
                                     searchMatch = true;
                                     break;
                                 }

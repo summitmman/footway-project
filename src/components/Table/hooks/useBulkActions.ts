@@ -10,6 +10,7 @@ interface IUseBulkActionsProps {
     editModalProps: IEditModalProps;
     setEditModalProps: (props: IEditModalProps) => void;
     showEditModal: (show: boolean) => void;
+    onEdit?: (data: Array<IDataRecord>) => void;
 }
 const useBulkActions = ({
     selectedRecords,
@@ -18,7 +19,8 @@ const useBulkActions = ({
     columnConfigs,
     editModalProps,
     setEditModalProps,
-    showEditModal
+    showEditModal,
+    onEdit
 }: IUseBulkActionsProps) => {
     const onGroupAction = (option: IOption<Function | IAction> | null) => {
         if (!option) {
@@ -29,6 +31,7 @@ const useBulkActions = ({
             // If function is provided it will return records with new value
             const newRecords = option.value(selectedRecords);
             setOriginalRecords(updateArrayWithAnother(newRecords, originalRecords));
+            onEdit && onEdit(newRecords);
         } else if (option.value.type === ActionType.RequestNewValue) {
             // else show edit modal for new value
             const config = columnConfigs.find(c => c.key === (option.value as IAction).columnKey);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IColumnConfig, IDataRecord, IEditModalProps } from "../../../shared/interfaces";
 import { updateArrayWithAnother } from "../../../shared/utils";
 
@@ -6,13 +6,16 @@ interface IUseEditProps {
     originalRecords: Array<IDataRecord>;
     setOriginalRecords: (records: Array<IDataRecord>) => void;
     selectedRecords: Array<IDataRecord>;
+    onEdit?: (data: Array<IDataRecord>) => void;
 }
 const useEdit = ({
     originalRecords,
     setOriginalRecords,
-    selectedRecords
+    selectedRecords,
+    onEdit
 }: IUseEditProps) => {
     const [showEditModal, setShowEditModal] = useState(false);
+    const isEdited = useRef<Array<IDataRecord>>([]);
     const [editModalProps, setEditModalProps] = useState<IEditModalProps>({
         value: '',
         record: null,
@@ -40,11 +43,12 @@ const useEdit = ({
     const editModalDone = (v: any) => {
         const { record, columnConfig } = editModalProps;
         if (record) {
+            isEdited.current = [{...record, [columnConfig!.key]: v}];
             setOriginalRecords(originalRecords.map(d => {
                 if (d.id === record.id) {
                     return {
                         ...d,
-                        [columnConfig!.key]: v
+                        [columnConfig!.key]: isEdited.current[0][columnConfig!.key]
                     };
                 }
                 return d;
@@ -53,12 +57,30 @@ const useEdit = ({
             const newData = selectedRecords.map(d => {
                 return { ...d, [columnConfig!.key]: v };
             });
+            isEdited.current = newData;
             setOriginalRecords(updateArrayWithAnother(newData, originalRecords));
         }
         // We can also perform validations here and if validation fails
         // we can avoid closing the dialog
         editModalCross();
     };
+
+    // Toggle Type handling
+    const toggleSwitch = (value: boolean, key: string, record: IDataRecord) => {
+        isEdited.current = [{...record, [key]: value}];
+        setOriginalRecords(originalRecords.map(d => {
+            if (d.id === record.id) {
+                return {...record, [key]: isEdited.current[0][key]};
+            }
+            return d
+        }));
+    };
+
+    useEffect(() => {
+        if (isEdited.current.length)
+            onEdit && onEdit(isEdited.current);
+        isEdited.current = [];
+    }, [isEdited.current]);
 
     return {
         showEditModal,
@@ -68,6 +90,7 @@ const useEdit = ({
         onEditableClick,
         editModalCross,
         editModalDone,
+        toggleSwitch
     };
 };
 

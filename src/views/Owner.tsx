@@ -84,11 +84,13 @@ const Owner = () => {
             setOwnerProducts([]);
         }
     }, [owner]);
-
+    const onEdit = (data: Array<IDataRecord>) => {
+        console.log('update server with', data);
+    };
 
     return (
         <>
-            { ownerProducts.length ? <Table key={owner} data={ownerProducts} columns={columns} groupActions={groupActions} /> : isPending ? <TableSkeleton /> : null }
+            { ownerProducts.length ? <Table key={owner} data={ownerProducts} columns={columns} groupActions={groupActions} onEdit={onEdit} /> : isPending ? <TableSkeleton /> : null }
         </>
     );
 }

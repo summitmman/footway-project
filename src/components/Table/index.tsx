@@ -12,9 +12,10 @@ interface ITableProps {
     data: Array<IDataRecord>;
     columns: Array<IColumnConfig>;
     groupActions?: Array<IOption<Function | IAction>>;
+    onEdit?: (data: Array<IDataRecord>) => void;
 }
 
-const Table = ({ data, columns, groupActions = [] }: ITableProps) => {
+const Table = ({ data, columns, groupActions = [], onEdit }: ITableProps) => {
     const [originalData, setOriginalData] = useState(data);
     const scrollableEl = useRef(null);
     const listRootEl = useRef(null);
@@ -31,15 +32,7 @@ const Table = ({ data, columns, groupActions = [] }: ITableProps) => {
     });
 
     // Table Functions
-    // Toggle Type handling
-    const toggleSwitch = (value: boolean, key: string, record: IDataRecord) => {
-        setOriginalData(originalData.map(d => {
-            if (d.id === record.id) {
-                return {...record, [key]: value};
-            }
-            return d
-        }));
-    };
+    
 
     // Row selections
     const {
@@ -51,7 +44,7 @@ const Table = ({ data, columns, groupActions = [] }: ITableProps) => {
     } = useSelect({
         filteredRecords,
         originalRecords: originalData,
-        setOriginalRecords: setOriginalData
+        setOriginalRecords: setOriginalData,
     });
 
     // Edit Column
@@ -62,11 +55,13 @@ const Table = ({ data, columns, groupActions = [] }: ITableProps) => {
         setShowEditModal,
         editModalCross,
         editModalDone,
-        onEditableClick
+        onEditableClick,
+        toggleSwitch
     } = useEdit({
         originalRecords: originalData,
         setOriginalRecords: setOriginalData,
-        selectedRecords
+        selectedRecords,
+        onEdit
     });
 
     // Bulk Actions
@@ -77,7 +72,8 @@ const Table = ({ data, columns, groupActions = [] }: ITableProps) => {
         originalRecords: originalData,
         selectedRecords,
         setOriginalRecords: setOriginalData,
-        showEditModal: setShowEditModal
+        showEditModal: setShowEditModal,
+        onEdit
     });
 
     const scrollManagedIndexes = useInfiniteScroll({

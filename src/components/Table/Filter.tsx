@@ -77,27 +77,20 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
     const [selectedFilterColumn, setSelectedFilterColumn] = useState(filterColumns[0]);
 
     // 4. Actual filter values selected
-    const [filterValues, setFilterValues] = useState<{[key: string]: Set<any>}>(filterColumns.reduce((acc, col) => {
-        return ({
-            ...acc,
-            [col.key]: new Set(),
-        });
-    }, {}))
+    const [filterValues, setFilterValues] = useState<{[key: string]: Set<any>}>({});
+    useEffect(() => {
+        setFilterValues(Object.keys(filterOptions).reduce((acc, key) => {
+            return {
+                ...acc,
+                [key]: new Set(filterOptions[key].filter(option => option.checked).map(option => option.value))
+            };
+        }, {}))
+    }, [filterOptions]);
     const noOfFilters = Object.keys(filterValues).reduce((acc, key) => acc + Number(!!filterValues[key].size), 0);
+    
 
     // 5. Filter select interaction
     const onFilterCheck = (isChecked: boolean, option: ICheckboxOption, key: string, index: number) => {
-        const newSet = new Set(filterValues[key]);
-        if (isChecked) {
-            newSet.add(option.value)
-        } else {
-            newSet.delete(option.value)
-        }
-        setFilterValues({
-            ...filterValues,
-            [key]: newSet
-        });
-
         setFilterOptions({
             ...filterOptions,
             [key]: filterOptions[key].map((o, i) => {
@@ -124,10 +117,6 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                     checked: false
             }))
         })
-        setFilterValues({
-            ...filterValues,
-            [key]: new Set()
-        });
     };
     const clearAllFilters = () => {
         setFilterOptions(Object.keys(filterOptions).reduce((acc, key) => {
@@ -138,12 +127,6 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                     checked: false
                 }))
             };
-        }, {}));
-        setFilterValues(filterColumns.reduce((acc, col) => {
-            return ({
-                ...acc,
-                [col.key]: new Set(),
-            });
         }, {}));
     };
     
@@ -178,7 +161,7 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
                                         onClick={() => setSelectedFilterColumn(col)}
                                     >
                                         <div className="break-words">{col.title}</div>
-                                        {filterValues[col.key].size > 0 && <div className="badge badge-primary">{filterValues[col.key].size}</div>}
+                                        {filterValues[col.key]?.size > 0 && <div className="badge badge-primary">{filterValues[col.key].size}</div>}
                                     </button>)
                             )}
                             <div className="p-5">

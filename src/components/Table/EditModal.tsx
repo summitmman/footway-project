@@ -58,12 +58,10 @@ const EditModal = ({ value='', columnConfig, record, onCross, onDone }: IEditMod
                         <button className="btn btn-sm btn-circle btn-ghost right-2 top-2" onClick={onCrossClick}>✕</button>
                     </form>
                 </div>
-                <p className="py-4">
-                    <form method="dialog" className="flex gap-4">
-                        <input ref={inputRef} type={columnConfig.type === HeaderType.Number ? 'number' : 'text'} placeholder={`Enter ${columnConfig.title}`} className="input input-bordered w-full flex-grow" value={editValue} onInput={handleInput} />
-                        <button className="btn btn-primary" onClick={onDoneClick}>Done</button>
-                    </form>
-                </p>
+                <form method="dialog" className="flex gap-4 py-4">
+                    <input ref={inputRef} type={columnConfig.type === HeaderType.Number ? 'number' : 'text'} placeholder={`Enter ${columnConfig.title}`} className="input input-bordered w-full flex-grow" value={editValue} onInput={handleInput} />
+                    <button className="btn btn-primary" onClick={onDoneClick}>Done</button>
+                </form>
             </div>
         </dialog>
     );

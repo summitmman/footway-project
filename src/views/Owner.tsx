@@ -82,23 +82,30 @@ const Owner = () => {
             }
         }
     ];
+    
     const [ownerProducts, setOwnerProducts] = useState<Array<IProduct>>([]);
+    const [tableKey, setTableKey] = useState(owner);
     useEffect(() => {
+        setTableKey(owner);
         if (owner) {
             setOwnerProducts(products.filter(product => product.merchant_id === owner));
         } else {
             setOwnerProducts([]);
         }
     }, [owner]);
+
     const onEdit = (data: Array<IDataRecord>) => {
         console.log('update server with', data);
     };
 
-    return (
-        <>
-            { ownerProducts.length ? <Table key={owner} data={ownerProducts} columns={columns} groupActions={groupActions} onEdit={onEdit} /> : isPending ? <TableSkeleton /> : null }
-        </>
-    );
+    if (ownerProducts.length) {
+        return <Table key={tableKey} data={ownerProducts} columns={columns} groupActions={groupActions} onEdit={onEdit} />;
+    }
+    if (isPending) {
+        return <TableSkeleton />;
+    }
+
+    return null;
 }
 
 export default Owner

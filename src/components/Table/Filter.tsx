@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { IColumnConfig, IOption } from "../../shared/interfaces";
+import { IColumnConfig, IDataRecord, IOption } from "../../shared/interfaces";
 
 interface IFilterProps {
-    data: Array<Record<string, any>>;
+    data: Array<IDataRecord>;
     columns: Array<IColumnConfig>;
     onFilterChange?: (filters: {[key: string]: Array<string|number|boolean>}) => void;
 }
@@ -16,7 +16,7 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
     // 1. Filter column configs
     // get columns we are concerned with
     const [filterColumns] = useState<Array<IColumnConfig>>(
-        columns.filter(column => (column.filter === true || (column.filter && column.filter.length)))
+        columns.filter(column => column.key && (column.filter === true || (column.filter && column.filter.length)))
     );
     // if there are no filters, then dont render the filter button
     if (!filterColumns.length) {
@@ -49,12 +49,13 @@ const Filter = ({ columns, data, onFilterChange }: IFilterProps) => {
         // create unique sets of each value
         data.forEach((d) => {
             keys.forEach((key) => {
-                if (Array.isArray(d[key])) {
-                    d[key].forEach(nd => {
+                let v = d[key];
+                if (Array.isArray(v)) {
+                    v.forEach(nd => {
                         uniqueSets[key].add(nd);
                     });
                 } else {
-                    uniqueSets[key].add(d[key]);
+                    uniqueSets[key].add(v);
                 }
             });
         });

@@ -24,6 +24,7 @@ export interface IProduct {
     image_url: string;
     price: string;
     product_description: string;
+    retailPrice?: number;
 }
 
 export interface IStoreContext {
@@ -40,10 +41,12 @@ export interface IColumnConfig {
     key: string;
     title: string;
     type: HeaderType;
+    value?: (record: IDataRecord, index: number) => any;
     filter?: boolean | Array<string|number|boolean>;
     editable?: boolean;
     control?: ControlType;
     component?: (record: IDataRecord, label: string, index: number) => JSX.Element;
+    cellClassName?: string;
 }
 export interface IOption<V=any, D=any> {
     label: string;
@@ -57,10 +60,11 @@ export interface IDataRecord {
     [key: string]: any;
 };
 
-export interface IAction {
-    type: ActionType;
-    columnKey: string;
-}
+export type GroupAction = (
+    { type: ActionType.RequestNewValue; columnKey: string; }
+    | { type: ActionType.SimpleFunction; fn: Function }
+    | { type: ActionType.HandleData; fn: Function }
+);
 
 export interface IEditModalProps {
     value: any;

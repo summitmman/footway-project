@@ -2,11 +2,16 @@ import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "../contexts";
 import { ProductCell, Table } from "../components";
 import { TableSkeleton } from "../components/Skeletons";
-import { IAction, IColumnConfig, IDataRecord, IOption, IProduct } from "../shared/interfaces";
+import { GroupAction, IColumnConfig, IDataRecord, IOption, IProduct } from "../shared/interfaces";
 import { ActionType, ControlType, HeaderType } from "../shared/enums";
 
 const Seller = () => {
     const { products, isPending } = useContext(StoreContext);
+    const [enabledProducts, setEnabledProducts] = useState<Array<IProduct>>([]);
+    useEffect(() => {
+        // add MSC enabled filter logic here
+        setEnabledProducts(products);
+    }, [products]);
     const columns: Array<IColumnConfig> = [
         {
             key: 'product_name',
@@ -16,9 +21,42 @@ const Seller = () => {
         },
         {
             key: 'price',
-            title: 'Price',
+            title: 'Wholesale Price',
+            type: HeaderType.Number,
+        },
+        {
+            key: 'retailPrice',
+            title: 'Retail Price',
             type: HeaderType.Number,
             editable: true
+        },
+        {
+            key: '',
+            title: 'Margin',
+            type: HeaderType.Number,
+            // implemented later, currently only used in table display and csv download
+            value: (record: IDataRecord) => {
+                const r = record as IProduct;
+                if (r.retailPrice == null) {
+                    return null;
+                }
+                const p = Number(!r.price ? '0' : r.price);
+                const margin = (((r.retailPrice - p) / r.retailPrice) * 100).toFixed(2);
+                return margin;
+            },
+            component: (record: IDataRecord, label: string) => {
+                if (label == null) {
+                    return <div className="badge badge-neutral">na</div>
+                }
+                return <div dangerouslySetInnerHTML={{__html: `${label}%`}}></div>;
+            }
+        },
+        {
+            key: 'enableToSell',
+            title: 'Sell',
+            type: HeaderType.Boolean,
+            editable: true,
+            control: ControlType.Switch
         },
         {
             key: 'quantity',
@@ -42,45 +80,72 @@ const Seller = () => {
             title: 'Department',
             type: HeaderType.StringArray,
             filter: true
-        },
-        {
-            key: '_enable',
-            title: 'Enable',
-            type: HeaderType.Boolean,
-            editable: true,
-            control: ControlType.Switch
         }
     ];
-    const groupActions: Array<IOption<Function | IAction>> = [
+    const groupActions: Array<IOption<GroupAction>> = [
         {
-            label: 'Enable Products',
-            value: (selectedDataSet: Array<IProduct>) => {
-                return selectedDataSet.map(d => {
-                    return { ...d, _enable: true };
-                });
+            label: 'Enable Sell',
+            value: {
+                type: ActionType.HandleData,
+                fn: (selectedDataSet: Array<IProduct>) => {
+                    return selectedDataSet.map(d => {
+                        return { ...d, enableToSell: true };
+                    });
+                }
             }
         },
         {
-            label: 'Disable Products',
-            value: (selectedDataSet: Array<IProduct>) => {
-                return selectedDataSet.map(d => {
-                    return { ...d, _enable: false };
-                });
+            label: 'Disable Sell',
+            value: {
+                type: ActionType.HandleData,
+                fn: (selectedDataSet: Array<IProduct>) => {
+                    return selectedDataSet.map(d => {
+                        return { ...d, enableToSell: false };
+                    });
+                }
             }
         },
         {
-            label: 'Set Price',
+            label: 'Set Retail Price',
             value: {
                 type: ActionType.RequestNewValue,
-                columnKey: 'price'
+                columnKey: 'retailPrice'
+            }
+        },
+        {
+            label: 'Download CSV',
+            value: {
+                type: ActionType.SimpleFunction,
+                fn: (selectedDataSet: Array<IProduct>) => {
+                    // ideally we should have a separate column config for CSV
+                    const headers = columns.map(column => column.title);
+                    const values = selectedDataSet.map((record, index) => {
+                        return columns.map(column => {
+                            if (column.value) {
+                                return column.value(record, index);
+                            }
+                            return (record as any)[column.key]
+                        });
+                    });
+                    const csvContent = [headers, ...values].map(e => e.join(',')).join('\n');
+                
+                    const encodedUri = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", "Products.csv");
+                    link.click();
+                }
             }
         }
     ];
+    const onEdit = (data: Array<IDataRecord>) => {
+        console.log('update server with', data);
+    };
 
 
     return (
         <>
-            { products.length ? <Table data={products} columns={columns} groupActions={groupActions} /> : isPending ? <TableSkeleton /> : null }
+            { enabledProducts.length ? <Table data={enabledProducts} columns={columns} groupActions={groupActions} onEdit={onEdit} /> : isPending ? <TableSkeleton /> : null }
         </>
     );
 }

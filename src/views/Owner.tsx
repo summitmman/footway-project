@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "../contexts";
 import { ProductCell, Table } from "../components";
 import { TableSkeleton } from "../components/Skeletons";
-import { IAction, IColumnConfig, IDataRecord, IOption, IProduct } from "../shared/interfaces";
+import { GroupAction, IColumnConfig, IDataRecord, IOption, IProduct } from "../shared/interfaces";
 import { ActionType, ControlType, HeaderType } from "../shared/enums";
 
 const Owner = () => {
@@ -51,21 +51,27 @@ const Owner = () => {
             control: ControlType.Switch
         }
     ];
-    const groupActions: Array<IOption<Function | IAction>> = [
+    const groupActions: Array<IOption<GroupAction>> = [
         {
             label: 'Enable Products',
-            value: (selectedDataSet: Array<IProduct>) => {
-                return selectedDataSet.map(d => {
-                    return { ...d, _enable: true };
-                });
+            value: {
+                type: ActionType.HandleData,
+                fn: (selectedDataSet: Array<IProduct>) => {
+                    return selectedDataSet.map(d => {
+                        return { ...d, _enable: true };
+                    });
+                }
             }
         },
         {
             label: 'Disable Products',
-            value: (selectedDataSet: Array<IProduct>) => {
-                return selectedDataSet.map(d => {
-                    return { ...d, _enable: false };
-                });
+            value: {
+                type: ActionType.HandleData,
+                fn: (selectedDataSet: Array<IProduct>) => {
+                    return selectedDataSet.map(d => {
+                        return { ...d, _enable: false };
+                    });
+                }
             }
         },
         {

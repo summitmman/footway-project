@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { IAction, IColumnConfig, IDataRecord, IOption } from "../../shared/interfaces";
+import { GroupAction, IColumnConfig, IDataRecord, IOption } from "../../shared/interfaces";
 import { CheckStatus, ControlType } from "../../shared/enums";
 import { highlight } from '../../shared/utils';
 import Search from "./Search";
@@ -11,7 +11,7 @@ import { useBulkActions, useEdit, useFilter, useInfiniteScroll, useSelect } from
 interface ITableProps {
     data: Array<IDataRecord>;
     columns: Array<IColumnConfig>;
-    groupActions?: Array<IOption<Function | IAction>>;
+    groupActions?: Array<IOption<GroupAction>>;
     onEdit?: (data: Array<IDataRecord>) => void;
 }
 
@@ -96,12 +96,12 @@ const Table = ({ data, columns, groupActions = [], onEdit }: ITableProps) => {
             </div>
             {/* Table */}
             <div ref={scrollableEl} className="overflow-auto" style={{height: '60vh'}} >
-                <table className="table table-lg table-pin-rows table-pin-cols">
+                <table className="table table-lg table-pin-rows w-full">
                     <thead>
                         <tr>
                             <th><a type="checkbox" className="checkbox checkbox-primary inline-block" aria-checked={ariaCheckedStatus} onClick={toggleAllSelect}></a></th>
                             {
-                                columns.map(column => (<th key={column.title}>
+                                columns.map(column => (<th key={column.title} className={column.cellClassName ?? ''}>
                                     { column.editable && (
                                         <svg width="10" height="10" viewBox="0 0 48 48" className="w-4 h-4 inline-block" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M7 42H43" stroke="currentColor" strokeWidth="4" strokeLinecap="butt" strokeLinejoin="bevel"></path>
@@ -125,16 +125,21 @@ const Table = ({ data, columns, groupActions = [], onEdit }: ITableProps) => {
                                         <td><input type="checkbox" className="checkbox checkbox-primary" checked={ !!record.__selected } onChange={() => toggleRowSelect(!record.__selected, record.id, record)} /></td>
                                         {
                                             columns.map(column => {
+                                                const value = column.value ? column.value(record, rowIndex) : record[column.key];
                                                 if (column.component) {
-                                                    return <td key={column.key + record.id}>{column.component(record, highlight(search, record[column.key]), rowIndex)}</td>
+                                                    return <td key={column.key + record.id} className={column.cellClassName ?? ''}>{column.component(record, highlight(search, value), rowIndex)}</td>
                                                 }
                                                 if (column.editable && column.control === ControlType.Switch) {
-                                                    return <td key={column.key + record.id}><input type="checkbox" className="toggle toggle-primary" checked={ !!record[column.key] } onChange={() => toggleSwitch(!record[column.key], column.key, record)} /></td>;
+                                                    return <td key={column.key + record.id} className={column.cellClassName ?? ''}><input type="checkbox" className="toggle toggle-primary" checked={ !!value } onChange={() => toggleSwitch(!value, column.key, record)} /></td>;
                                                 }
                                                 if (column.editable) {
-                                                    return <td key={column.key + record.id}><a className="cursor-pointer hover:text-primary" onClick={() => onEditableClick(record, column)} dangerouslySetInnerHTML={{__html: highlight(search, record[column.key])}}></a></td>
+                                                    return (<td key={column.key + record.id} className={column.cellClassName ?? ''}>
+                                                        <a className="group cursor-pointer hover:text-primary" onClick={() => onEditableClick(record, column)}>
+                                                            { value == null ? <div className="badge badge-neutral group-hover:badge-primary">no value</div> : <div dangerouslySetInnerHTML={{__html: highlight(search, value)}}></div> }
+                                                        </a>
+                                                    </td>);
                                                 }
-                                                return <td key={column.key + record.id} dangerouslySetInnerHTML={{__html: highlight(search, record[column.key])}}></td>
+                                                return <td key={column.key + record.id} className={column.cellClassName ?? ''} dangerouslySetInnerHTML={{__html: highlight(search, value)}}></td>
                                             })
                                         }
                                     </tr>

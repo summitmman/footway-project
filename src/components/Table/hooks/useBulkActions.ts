@@ -1,5 +1,5 @@
 import { ActionType } from "../../../shared/enums";
-import { IAction, IColumnConfig, IDataRecord, IEditModalProps, IOption } from "../../../shared/interfaces";
+import { GroupAction, IColumnConfig, IDataRecord, IEditModalProps, IOption } from "../../../shared/interfaces";
 import { updateArrayWithAnother } from "../../../shared/utils";
 
 interface IUseBulkActionsProps {
@@ -22,19 +22,19 @@ const useBulkActions = ({
     showEditModal,
     onEdit
 }: IUseBulkActionsProps) => {
-    const onGroupAction = (option: IOption<Function | IAction> | null) => {
+    const onGroupAction = (option: IOption<GroupAction> | null) => {
         if (!option) {
             return;
         }
 
-        if (typeof option.value === 'function') {
+        if (option.value.type === ActionType.HandleData) {
             // If function is provided it will return records with new value
-            const newRecords = option.value(selectedRecords);
+            const newRecords = option.value.fn(selectedRecords);
             setOriginalRecords(updateArrayWithAnother(newRecords, originalRecords));
             onEdit && onEdit(newRecords);
         } else if (option.value.type === ActionType.RequestNewValue) {
             // else show edit modal for new value
-            const config = columnConfigs.find(c => c.key === (option.value as IAction).columnKey);
+            const config = columnConfigs.find(c => c.key === (option.value as {type: ActionType.RequestNewValue; columnKey: string}).columnKey);
             if (!config) {
                 return;
             }
@@ -46,6 +46,8 @@ const useBulkActions = ({
                 value: ''
             });
             showEditModal(true);
+        } else if (option.value.type === ActionType.SimpleFunction) {
+            option.value.fn(selectedRecords);
         }
     };
 

@@ -15,7 +15,9 @@ export enum ControlType {
 }
 
 export enum ActionType {
-    RequestNewValue = 'RequestNewValue'
+    RequestNewValue = 'RequestNewValue',
+    SimpleFunction = 'SimpleFunction',
+    HandleData = 'HandleData'
 }
 
 export enum CheckStatus {

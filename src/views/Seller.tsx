@@ -44,7 +44,7 @@ const Seller = () => {
                 const margin = (((r.retailPrice - p) / r.retailPrice) * 100).toFixed(2);
                 return margin;
             },
-            component: (record: IDataRecord, label: string) => {
+            component: (_record: IDataRecord, label: string) => {
                 if (label == null) {
                     return <div className="badge badge-neutral">na</div>
                 }
